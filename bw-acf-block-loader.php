@@ -128,15 +128,17 @@ class BW_Shortcode_Components {
     }
 
     private function register_assets_in_dir($dir) {
-        $css_files = $this->get_files_in_dir($dir, 'style.css');
-        $js_files = $this->get_files_in_dir($dir, 'script.js');
-
+        $css_files = $this->get_files_in_dir($dir, '*.css'); // Alle CSS-Dateien
+        $js_files = $this->get_files_in_dir($dir, '*.js');   // Alle JS-Dateien
+    
+        // CSS-Dateien registrieren
         foreach ($css_files as $file) {
             $handle = 'bw-style-' . md5($file);
             $url = str_replace($this->theme_dir, $this->theme_uri, $file);
             wp_register_style($handle, $url, [], filemtime($file));
         }
-
+    
+        // JS-Dateien registrieren
         foreach ($js_files as $file) {
             $handle = 'bw-script-' . md5($file);
             $url = str_replace($this->theme_dir, $this->theme_uri, $file);
@@ -145,18 +147,23 @@ class BW_Shortcode_Components {
     }
 
     private function enqueue_assets($dir) {
-        $css_file = $dir . '/style.css';
-        if (file_exists($css_file)) {
-            $handle = 'bw-style-' . md5($css_file);
-            wp_enqueue_style($handle);
+        // Alle CSS-Dateien einbinden
+        foreach (glob($dir . '/*.css') as $css_file) {
+            if (file_exists($css_file)) {
+                $handle = 'bw-style-' . md5($css_file);
+                wp_enqueue_style($handle);
+            }
         }
-
-        $js_file = $dir . '/script.js';
-        if (file_exists($js_file)) {
-            $handle = 'bw-script-' . md5($js_file);
-            wp_enqueue_script($handle);
+    
+        // Alle JS-Dateien einbinden
+        foreach (glob($dir . '/*.js') as $js_file) {
+            if (file_exists($js_file)) {
+                $handle = 'bw-script-' . md5($js_file);
+                wp_enqueue_script($handle);
+            }
         }
     }
+
 
     private function include_widget_files($filename) {
         $files = array_merge(
